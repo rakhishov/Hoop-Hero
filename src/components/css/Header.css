@@ -1,0 +1,13 @@
+.header{
+    background-color: #a1cebe;
+    padding: 10px;
+}
+
+.info:hover{
+    cursor: pointer;
+}
+
+.text-title{
+    position: relative;
+    bottom: -2px;
+}

@@ -1,0 +1,21 @@
+
+
+.main-footer {
+    color: black;
+    background-color: #a1cebe;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 1em 0 1em 0;
+    position: relative;
+}
+.footer-content{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+.social{
+    display: flex;
+    justify-content: center;
+    padding-top: 1vh;
+    gap: 2vh
+}
