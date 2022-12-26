@@ -11,9 +11,8 @@ const ModalGuess = ({stat, f, guess, didGuess}) => {
   const [[h, m, s], setTime] = useState([hour, min, sec]);
 
   const tick =()=>{
-      console.log(h+" "+m+ " "+ s)
       if (h === 0 && m === 0 && s === 0) {
-          setOver(true);
+          setTime(23, 59, 59);
       } else if (m === 0 && s === 0) {
           setTime([24-h, 59, 59]);
       } else if (s == 0) {

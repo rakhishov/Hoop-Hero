@@ -18,8 +18,10 @@ const Game = () =>{
   const arrowDown = <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M11 21.883l-6.235-7.527-.765.644 7.521 9 7.479-9-.764-.645-6.236 7.529v-21.884h-1v21.883z"/></svg>
   const fetchGuess = async(id) =>{
     setGuess(JSON.parse(localStorage.getItem("guess")));
+    var ids = [666786, 145, 132, 175, 15, 434, 115, 140, 322, 57, 237, 490, 117, 70, 125, 666969, 246, 172, 3547238, 274, 472, 417]
+    var randPlayer = ids[Math.floor(Math.random() * ids.length)]
     if(guess === undefined){
-      await axios.get(`https://www.balldontlie.io/api/v1/players/${id}`)
+      await axios.get(`https://www.balldontlie.io/api/v1/players/${randPlayer}`)
       .then(res => {
           setGuess(res.data);
           localStorage.setItem("guess", JSON.stringify(res.data))
@@ -28,17 +30,20 @@ const Game = () =>{
   }
 
   useEffect(()=>{
-    fetchGuess(115);
+    fetchGuess(15);
     var players = JSON.parse(localStorage.getItem("players") || "[]")
     var didG = JSON.parse(localStorage.getItem("didGuess") || false);
     var didFinish = JSON.parse(localStorage.getItem("didFinish") || false);
+    var nGuess = JSON.parse(localStorage.getItem("numOfGuess") || 0);
     updateSelectedPlayer(players);
     setDidGuess(didG);
     setFinish(didFinish);
+    setNGuess(nGuess);
   }, [])
 
 
   const inputHandler = () => {
+
     return axios.get(`https://www.balldontlie.io/api/v1/players?search=${inputValue}`)
     .then(res =>{
       const dat = res.data.data.filter(p=>{
@@ -67,6 +72,8 @@ const Game = () =>{
       localStorage.setItem("didFinish", true);
     }
     setNGuess(numOfGuess+1);
+    var n = JSON.parse(localStorage.getItem('numOfGuess') || 0)
+    localStorage.setItem("numOfGuess", n+1);
     if(numOfGuess == limitOfGuess-1){
       setFinish(true);
       localStorage.setItem("didFinish", true)
@@ -80,7 +87,6 @@ const Game = () =>{
     <div className="game">
       
       <div>
-      {/* {guess!==undefined && <h2>{guess.first_name} {guess.last_name}</h2>} */}
       <AsyncSelect
       
       className="search-bar" 
@@ -95,7 +101,9 @@ const Game = () =>{
       onChange={handleChange}
       escapeClearsValue={true}
       
-      placeholder={`Guess ${numOfGuess+1} of ${limitOfGuess}`}
+      placeholder={!didGuess ? 
+      `Guess ${Math.min(numOfGuess+1, limitOfGuess)} of ${limitOfGuess}`
+      :"Nice Job Man"}
       /> 
       </div>
     <div>
@@ -140,7 +148,7 @@ const Game = () =>{
                         </div>
                     </div>
                   ))}
-                  {(numOfGuess === limitOfGuess-1 && !didGuess)&&
+                  {(numOfGuess === limitOfGuess && !didGuess)&&
                   <div className="player-full">
                     <h2 className="player-name">{guess.first_name} {guess.last_name}</h2>
                     <div className ="player">
