@@ -17,15 +17,24 @@ const Game = () =>{
   const arrowUp = <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M11 2.206l-6.235 7.528-.765-.645 7.521-9 7.479 9-.764.646-6.236-7.53v21.884h-1v-21.883z"/></svg>
   const arrowDown = <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M11 21.883l-6.235-7.527-.765.644 7.521 9 7.479-9-.764-.645-6.236 7.529v-21.884h-1v21.883z"/></svg>
   const fetchGuess = async(id) =>{
-
-    await axios.get(`https://www.balldontlie.io/api/v1/players/${id}`)
+    setGuess(JSON.parse(localStorage.getItem("guess")));
+    if(guess === undefined){
+      await axios.get(`https://www.balldontlie.io/api/v1/players/${id}`)
       .then(res => {
-          setGuess(res.data)
+          setGuess(res.data);
+          localStorage.setItem("guess", JSON.stringify(res.data))
         })
+    }
   }
 
   useEffect(()=>{
     fetchGuess(115);
+    var players = JSON.parse(localStorage.getItem("players") || "[]")
+    var didG = JSON.parse(localStorage.getItem("didGuess") || false);
+    var didFinish = JSON.parse(localStorage.getItem("didFinish") || false);
+    updateSelectedPlayer(players);
+    setDidGuess(didG);
+    setFinish(didFinish);
   }, [])
 
 
@@ -41,17 +50,26 @@ const Game = () =>{
 
   
   const handleChange = (p) =>{
-    console.log(p)
+
+
     updateSelectedPlayer(arr => [...arr, p]);
-    console.log(guess);
+
+    var players = JSON.parse(localStorage.getItem("players") || "[]")
+    console.log(players)
+    players.push(p);
+    localStorage.setItem("players", JSON.stringify(players));
+
+    
     if( JSON.stringify(p) === JSON.stringify(guess)){
       setDidGuess(true);
       setFinish(true);
+      localStorage.setItem("didGuess", true);
+      localStorage.setItem("didFinish", true);
     }
     setNGuess(numOfGuess+1);
-    console.log(numOfGuess)
     if(numOfGuess == limitOfGuess-1){
       setFinish(true);
+      localStorage.setItem("didFinish", true)
     }
   }
   const handleInput = (p) =>{
@@ -122,7 +140,7 @@ const Game = () =>{
                         </div>
                     </div>
                   ))}
-                  {(numOfGuess === limitOfGuess && !didGuess)&&
+                  {(numOfGuess === limitOfGuess-1 && !didGuess)&&
                   <div className="player-full">
                     <h2 className="player-name">{guess.first_name} {guess.last_name}</h2>
                     <div className ="player">
