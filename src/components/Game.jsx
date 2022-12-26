@@ -16,12 +16,11 @@ const Game = () =>{
   const limitOfGuess = 5
   const arrowUp = <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M11 2.206l-6.235 7.528-.765-.645 7.521-9 7.479 9-.764.646-6.236-7.53v21.884h-1v-21.883z"/></svg>
   const arrowDown = <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M11 21.883l-6.235-7.527-.765.644 7.521 9 7.479-9-.764-.645-6.236 7.529v-21.884h-1v21.883z"/></svg>
-  const fetchGuess = async(id) =>{
+  const fetchGuess = async() =>{
     setGuess(JSON.parse(localStorage.getItem("guess")));
-    var ids = [666786, 145, 132, 175, 15, 434, 115, 140, 322, 57, 237, 490, 117, 70, 125, 666969, 246, 172, 3547238, 274, 472, 417]
-    var randPlayer = ids[Math.floor(Math.random() * ids.length)]
+    var id = JSON.parse(localStorage.getItem("playerid"));
     if(guess === undefined){
-      await axios.get(`https://www.balldontlie.io/api/v1/players/${randPlayer}`)
+      await axios.get(`https://www.balldontlie.io/api/v1/players/${id}`)
       .then(res => {
           setGuess(res.data);
           localStorage.setItem("guess", JSON.stringify(res.data))
@@ -29,8 +28,19 @@ const Game = () =>{
     }
   }
 
+  const getId = ()=>{
+    if("playerid" in localStorage){
+    }
+    else{
+      var ids = [666786, 145, 132, 175, 15, 434, 115, 140, 322, 57, 237, 490, 117, 70, 125, 666969, 246, 172, 3547238, 274, 472, 417]
+      var randPlayer = ids[Math.floor(Math.random() * ids.length)]
+      localStorage.setItem("playerid", randPlayer);
+    }
+  }
+
   useEffect(()=>{
-    fetchGuess(15);
+    getId();
+    fetchGuess();
     var players = JSON.parse(localStorage.getItem("players") || "[]")
     var didG = JSON.parse(localStorage.getItem("didGuess") || false);
     var didFinish = JSON.parse(localStorage.getItem("didFinish") || false);
