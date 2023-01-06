@@ -14,22 +14,47 @@ body{
 
 .game{
   flex: 1;
-  max-width: 1280px;
+  max-width: 100vw;
   margin: 0 auto;
   padding: 2rem;
 }
+.guess-photo{
+  width: 70%;
+  height: auto;
+}
+.guess-name{
+  font-weight: 900;
+}
+.guess-borders{
+  
+  border-top: 1px solid;
+  border-bottom: 1px solid;
+  margin-bottom: 10px;
+  
+}
+.guess-content{
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+.success-try{
+  border-color: #37be75;
+}
+
+.unsuccess-try{
+  border-color: red;
+}
+
 .tag{
   margin-top: 10px;
 }
 .search-bar{
   text-align: left;
-  min-width: 450px;
+  min-width: 20vw;
 }
 
 .guesses{
   margin-top: 5vh;
-  box-shadow: inset 0 3px 6px rgba(0,0,0,0.16), 0 4px 6px rgba(0,0,0,0.45);
-  border-radius: 10px;
+  
 }
 .players{
   margin-top: 5px;
@@ -37,14 +62,16 @@ body{
 .player{
   display:flex;
   gap: 2vh;
+  align-items: center;
+  justify-content: center;
 }
 .player-name{
   margin-bottom: 2vh;
 }
 .player-item{
   display: flex;
-  width: 5em;
-  height: 5em;
+  width: 7vh;
+  height: 7vh;
   background-color: lightblue;
   border-radius: 50%;
   justify-content: center;
@@ -52,6 +79,10 @@ body{
 }
 
 
+.modal-guess{
+  justify-content: center;
+  align-items: center;
+}
 .right{
   background-color: #37be75;
 }
@@ -113,4 +144,11 @@ body{
 
 .player-full{
   padding: 1vh 2vh 2vh 2vh;
+}
+
+@media screen and (min-width: 800px) {
+  .guesses{
+    box-shadow: inset 0 3px 6px rgba(0,0,0,0.16), 0 4px 6px rgba(0,0,0,0.45);
+    border-radius: 10px;
+  }
 }

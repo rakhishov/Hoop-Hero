@@ -4,6 +4,7 @@ import AsyncSelect from 'react-select/async'
 import { useEffect } from "react";
 import * as NBAIcons from 'react-nba-logos';
 import ModalGuess from "./ModalGuess";
+
 const Game = () =>{
   const [inputValue, setInput] = useState()
   const [selectedPlayer, updateSelectedPlayer] = useState([]);
@@ -65,16 +66,15 @@ const Game = () =>{
 
   
   const handleChange = (p) =>{
-
-
+    
     updateSelectedPlayer(arr => [...arr, p]);
 
     var players = JSON.parse(localStorage.getItem("players") || "[]")
-    console.log(players)
+    
     players.push(p);
     localStorage.setItem("players", JSON.stringify(players));
 
-    
+
     if( JSON.stringify(p) === JSON.stringify(guess)){
       setDidGuess(true);
       setFinish(true);
@@ -95,7 +95,6 @@ const Game = () =>{
 
   return (
     <div className="game">
-      
       <div>
       <AsyncSelect
       
@@ -116,13 +115,13 @@ const Game = () =>{
       :"Nice Job Man"}
       /> 
       </div>
-    <div>
+      <div>
       {
       <div className="guesses">
         <div className="players">
                   {selectedPlayer.map(p =>(
                     <div className="player-full">
-                    <h2 className="player-name">{p.first_name} {p.last_name}</h2>
+                    <h2 className="player-name">{p.first_name} {p.last_name} </h2>
                       <div className ="player">
                         <div>
                           <div className={p.team.abbreviation === guess.team.abbreviation ? "player-item right animate" :"player-item animate"}>
@@ -141,7 +140,7 @@ const Game = () =>{
                           </div>
                         </div>
                         <div>
-                          <div className={p.team.division === guess.team.division ? "player-item right animate delay2" :"player-item animate delay2"}>{p.team.division}</div>
+                          <div className={p.team.division === guess.team.division ? "player-item right animate delay2" :"player-item animate delay2"}>{shortDivision(p.team.division)}</div>
                           <div className="tag">DIV</div>
                         </div>
                         <div>
@@ -175,7 +174,7 @@ const Game = () =>{
                         </div>
                       </div>
                       <div>
-                        <div className={"player-item wrong animate delay2"}>{guess.team.division}</div> 
+                        <div className={"player-item wrong animate delay2"}>{shortDivision(guess.team.division)}</div> 
                         <div className="tag">
                           DIV
                         </div>
@@ -201,6 +200,7 @@ const Game = () =>{
                     f={() => setModalGuessShow(false)}
                     guess = {guess}
                     didGuess = {didGuess}
+                    numOfGuess = {numOfGuess}
                   />}
             </div>
         </div>
@@ -209,5 +209,27 @@ const Game = () =>{
     </div>
     );
 }
+function shortDivision(div){
+  if("Atlantic"){
+    return "Atl.";
+  }
+  if("Pacific"){
+    return "Pacific";
+  }
 
+  if("Southwest"){
+    return "SW";
+  }
+  if("Southeast"){
+    return "SE";
+  }
+
+  if("Central"){
+    return "Cent."
+  }
+
+  if("Northwest"){
+    return "NW";
+  }
+}
 export default Game;

@@ -5,6 +5,8 @@ import ModalInstructions from './components/Modal'
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Footer from './components/Footer';
 import Header from './components/Header';
+
+
 function App() {
   var modalOpen = JSON.parse(localStorage.getItem("didFinish") || false);
   const [modalInstructionsShow, setModalInstructionsShow] = useState(!modalOpen);
