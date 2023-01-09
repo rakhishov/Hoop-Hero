@@ -29,9 +29,9 @@ const Game = () =>{
             .then(res =>{
               
               const stats = res.data.data[0]
-              guess.pts = stats.pts
-              guess.ast = stats.ast
-              guess.reb = stats.reb
+              guess.pts = roundToOne(stats.pts)
+              guess.ast = roundToOne(stats.ast)
+              guess.reb = roundToOne(stats.reb)
               setGuess(guess);
             })
           
