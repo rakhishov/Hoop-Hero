@@ -60,7 +60,7 @@ const ModalGuess = ({stat, f, guess, didGuess, numOfGuess}) => {
                 <img className='guess-photo' src={imgId == null ? loading : urlImg + imgId + ".png"}
                 />
                 
-                <p>{didGuess && `Amazing! It took only ${numOfGuess} guesses`} {!didGuess && "Loser"}</p>
+                <p className='finished-game'>{didGuess && `Amazing! It took only ${numOfGuess} guesses`} {!didGuess && "Unfortunately, You couldn't guess it :("}</p>
               </div>
               
             </div>

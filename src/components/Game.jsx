@@ -4,6 +4,7 @@ import AsyncSelect from 'react-select/async'
 import { useEffect } from "react";
 import * as NBAIcons from 'react-nba-logos';
 import ModalGuess from "./ModalGuess";
+import { set } from "firebase/database";
 
 const Game = () =>{
   const [inputValue, setInput] = useState()
@@ -15,15 +16,25 @@ const Game = () =>{
   const [modalGuess, setModalGuessShow] = useState(true)
 
   const limitOfGuess = 5
-  const arrowUp = <svg width="20" height="20" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M11 2.206l-6.235 7.528-.765-.645 7.521-9 7.479 9-.764.646-6.236-7.53v21.884h-1v-21.883z"/></svg>
-  const arrowDown = <svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M11 21.883l-6.235-7.527-.765.644 7.521 9 7.479-9-.764-.645-6.236 7.529v-21.884h-1v21.883z"/></svg>
+  const arrowUp = "\u2191"
+  const arrowDown = "\u2193"
   const fetchGuess = async() =>{
     setGuess(JSON.parse(localStorage.getItem("guess")));
     var id = JSON.parse(localStorage.getItem("playerid"));
     if(guess === undefined){
       await axios.get(`https://www.balldontlie.io/api/v1/players/${id}`)
-      .then(res => {
-          setGuess(res.data);
+      .then(async(res) => {
+          const guess = res.data
+          await axios.get(`https://www.balldontlie.io/api/v1/season_averages?player_ids[]=${guess.id}`)
+            .then(res =>{
+              
+              const stats = res.data.data[0]
+              guess.pts = stats.pts
+              guess.ast = stats.ast
+              guess.reb = stats.reb
+              setGuess(guess);
+            })
+          
           localStorage.setItem("guess", JSON.stringify(res.data))
         })
     }
@@ -40,6 +51,7 @@ const Game = () =>{
   }
 
   useEffect(()=>{
+    //setStorage();
     getId();
     fetchGuess();
     var players = JSON.parse(localStorage.getItem("players") || "[]")
@@ -65,7 +77,24 @@ const Game = () =>{
   }
 
   
-  const handleChange = (p) =>{
+  const handleChange = async(p) =>{
+    
+    const response = await axios.get(`https://www.balldontlie.io/api/v1/season_averages?player_ids[]=${p.id}`)
+    .then(res =>{
+      const stats = res.data.data[0]
+      
+      if(stats!=undefined){
+        p.pts = roundToOne(stats.pts)
+        p.ast = roundToOne(stats.ast)
+        p.reb = roundToOne(stats.reb)
+      }
+      else{
+        p.pts = "DNP"
+        p.ast = "THIS"
+        p.reb = "SEASON"
+      }
+    })
+    
     
     updateSelectedPlayer(arr => [...arr, p]);
 
@@ -94,8 +123,9 @@ const Game = () =>{
   }
 
   return (
+    <>
     <div className="game">
-      <div>
+      <div className>
       <AsyncSelect
       
       className="search-bar" 
@@ -108,7 +138,7 @@ const Game = () =>{
       isSearchable={finish ? false : true}
       isDisabled={finish ? true : false}
       onChange={handleChange}
-      escapeClearsValue={true}
+      escapeClear sValue={true}
       
       placeholder={!didGuess ? 
       `Guess ${Math.min(numOfGuess+1, limitOfGuess)} of ${limitOfGuess}`
@@ -116,79 +146,52 @@ const Game = () =>{
       /> 
       </div>
       <div>
+        
       {
       <div className="guesses">
         <div className="players">
                   {selectedPlayer.map(p =>(
-                    <div className="player-full">
-                    <h2 className="player-name">{p.first_name} {p.last_name} </h2>
-                      <div className ="player">
-                        <div>
-                          <div className={p.team.abbreviation === guess.team.abbreviation ? "player-item right animate" :"player-item animate"}>
-                            {React.createElement(NBAIcons[p.team.abbreviation],{size:70})}
-                          </div>
-                          <div className="tag">
-                            TEAM
-                          </div>
-                        </div>
-                        <div>
-                          <div className={p.team.conference === guess.team.conference ? "player-item right animate delay1" :"player-item animate delay1"}>
-                            {p.team.conference}
-                          </div>
-                          <div className="tag">
-                            CONF
-                          </div>
-                        </div>
-                        <div>
-                          <div className={p.team.division === guess.team.division ? "player-item right animate delay2" :"player-item animate delay2"}>{shortDivision(p.team.division)}</div>
-                          <div className="tag">DIV</div>
-                        </div>
-                        <div>
-                          <div className={p.position === guess.position ? "player-item right animate delay3" :"player-item animate delay3"}>{p.position}</div>
-                          <div className="tag">POS</div>
-                        </div>
-                        <div>
-                        <div className={(p.height_feet === guess.height_feet && p.height_inches === guess.height_inches) ? "player-item right animate delay4" : "player-item animate delay4"}>
-                        {p.height_feet === "" || p.height_feet === null ? "" : p.height_feet + "'" + p.height_inches + "''"} {p.height_feet!=" " && p.height_feet!=null && p.height_feet*12+p.height_inches>guess.height_feet*12+guess.height_inches && arrowDown} 
-                        {p.height_feet!=" " && p.height_feet!=null && p.height_feet*12+p.height_inches<guess.height_feet*12+guess.height_inches && arrowUp} 
-                        </div>
-                        <div className="tag">HT</div>
-                        </div>
-                        </div>
-                    </div>
+                    getPlayer(p, guess, arrowDown, arrowUp, numOfGuess)
                   ))}
                   {(numOfGuess === limitOfGuess && !didGuess)&&
                   <div className="player-full">
                     <h2 className="player-name">{guess.first_name} {guess.last_name}</h2>
                     <div className ="player">
-                      <div>
+                      <div className="player-box">
                         <div className={"player-item wrong animate"}>{React.createElement(NBAIcons[guess.team.abbreviation],{size:70})}</div>
                         <div className="tag">
                           TEAM
                         </div>
                       </div>
-                      <div>
+                      <div className="player-box">
                         <div className={"player-item wrong animate delay1"}>{guess.team.conference}</div>
                         <div className="tag">
                           CONF
                         </div>
                       </div>
-                      <div>
-                        <div className={"player-item wrong animate delay2"}>{shortDivision(guess.team.division)}</div> 
-                        <div className="tag">
-                          DIV
-                        </div>
-                      </div>
-                      <div>
-                        <div className={"player-item wrong animate delay3"}>{guess.position}</div>
+                     
+                      <div className="player-box">
+                        <div className={"player-item wrong animate delay2"}>{guess.position}</div>
                         <div className="tag">
                           POS
                         </div>
                       </div>
-                      <div>
-                        <div className={"player-item wrong animate delay4"}>{guess.height_feet}'{guess.height_inches}''</div>
+                      <div className="player-box">
+                        <div className={"player-item wrong animate delay3"}>{guess.pts}</div>
                         <div className="tag">
-                          HT
+                          PTS
+                        </div>
+                      </div>
+                      <div className="player-box">
+                        <div className={"player-item wrong animate delay4"}>{guess.ast}</div>
+                        <div className="tag">
+                          AST
+                        </div>
+                      </div>
+                      <div className="player-box">
+                        <div className={"player-item wrong animate delay5"}>{guess.reb}</div>
+                        <div className="tag">
+                          AST
                         </div>
                       </div>
                       </div>
@@ -207,29 +210,90 @@ const Game = () =>{
         }
       </div>
     </div>
+    </>
     );
+} 
+
+function isClose(stats, player, guess){
+  if(player === "DNP" || player === "THIS" || player === "SEASON"){
+    return "retired";
+  }
+  if(stats === 'pts' && Math.abs(player-guess)<5){
+      return "close";
+  }
+
+  if(stats === 'ast' && Math.abs(player-guess)<2){
+    return "close";
+  }
+
+  if(stats === 'reb' && Math.abs(player-guess)<3){
+    return "close";
+  }
+  return ""
+  
 }
-function shortDivision(div){
-  if("Atlantic"){
-    return "Atl.";
-  }
-  if("Pacific"){
-    return "Pacific";
-  }
 
-  if("Southwest"){
-    return "SW";
+function getPlayer(p, guess, arrowDown, arrowUp){
+  return(
+              <div className="player-full">
+                
+                    <h2 className="player-name">{p.first_name} {p.last_name} </h2>
+                    
+                      <div className ="player">
+                      
+                        <div className="player-box">
+                          <div className={p.team.abbreviation === guess.team.abbreviation ? "player-item right animate" :"player-item animate"}>
+                            {React.createElement(NBAIcons[p.team.abbreviation],{size:70})}
+                          </div>
+                          <div className="tag">
+                            TEAM
+                          </div>
+                        </div>
+                        <div className="player-box">
+                          <div className={p.team.conference === guess.team.conference ? "player-item right animate delay1" :"player-item animate delay1"}>
+                            {p.team.conference}
+                          </div>
+                          <div className="tag">
+                            CONF
+                          </div>
+                        </div>
+                        <div className="player-box">
+                          <div className={p.position === guess.position ? "player-item right animate delay2" :"player-item animate delay2"}>{p.position}</div>
+                          <div className="tag">POS</div>
+                        </div>
+                        <div className="player-box">
+                          <div className={p.pts === guess.pts ? "player-item right animate delay3" :"player-item animate delay3 " + isClose("pts", p.pts, guess.pts)}>{p.pts}{(p.pts === "DNP" || p.pts === guess.pts) ? "" : (p.pts>guess.pts ? arrowDown : arrowUp)}</div>
+                          <div className="tag">PTS</div>
+                        </div>
+                        <div className="player-box">
+                          <div className={p.ast === guess.ast ? "player-item right animate delay4" :"player-item animate delay4 " + isClose("ast", p.ast, guess.ast)}>{p.ast}{(p.ast === "THIS" || p.ast === guess.ast) ? "" : (p.ast>guess.ast ? arrowDown : arrowUp)}</div>
+                          <div className="tag">AST</div>
+                        </div>
+                        <div className="player-box">
+                          <div className={p.reb === guess.reb ? "player-item right animate delay5" :"player-item animate delay5 " + isClose("reb", p.reb, guess.reb)}>{p.reb}{(p.reb === "SEASON" || p.reb === guess.reb) ? "" : (p.reb>guess.reb ? arrowDown : arrowUp)}</div>
+                          <div className="tag">REB</div>
+                        </div>
+                        
+                        </div>
+                    </div>
+  )
+}
+function setStorage(){
+  var now = new Date().getTime()
+  var setupTime = localStorage.getItem("setupTime")
+  if(setupTime == null){
+    localStorage.setItem("setupTime", now);
   }
-  if("Southeast"){
-    return "SE";
-  }
-
-  if("Central"){
-    return "Cent."
-  }
-
-  if("Northwest"){
-    return "NW";
+  else{
+    if(now-setupTime > 10*1000){
+      localStorage.clear()
+      localStorage.setItem("setupTime", now)
+    }
   }
 }
+
+function roundToOne(n){
+  return Math.round((n + Number.EPSILON)*10)/10;
+}
+
 export default Game;
