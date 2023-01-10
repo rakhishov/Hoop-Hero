@@ -55,6 +55,7 @@ body{
 .guess-photo{
   width: 70%;
   height: auto;
+  /* filter: brightness(0) */
 }
 .guess-name{
   font-weight: 900;

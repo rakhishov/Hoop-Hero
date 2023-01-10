@@ -57,9 +57,7 @@ const ModalGuess = ({stat, f, guess, didGuess, numOfGuess}) => {
             <h3 className="guess-name">{guess!=undefined && guess.first_name + " " + guess.last_name} </h3>
             <div className={'guess-borders ' + (didGuess ? "success-try" : "unsuccess-try")}>
               <div className='guess-content'>
-                <img className='guess-photo' src={imgId == null ? loading : urlImg + imgId + ".png"}
-                />
-                
+                {imgId == null ? <img className='loading-screen' src = {loading} /> : <img className='guess-photo' src = {urlImg+imgId+".png"}/>}
                 <p className='finished-game'>{didGuess && `Amazing! It took only ${numOfGuess} guesses`} {!didGuess && "Unfortunately, You couldn't guess it :("}</p>
               </div>
               

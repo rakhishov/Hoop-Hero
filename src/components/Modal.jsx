@@ -69,7 +69,7 @@ const ModalInstructions = (props) => {
             </p>
             <span>This means that mystery player <b>is not playing for 76ers</b>,
               he is from <b>East</b> conference playing <b>Center</b> position. This player
-              averages <b>less than 33.5 PTS </b>, <b>more and close to 4.57 AST</b> and <b>9.82 REB</b>.
+              averages <b>less than 33.5 PTS </b>, <b>more and close to 4.6 AST</b> and <b>9.8 REB</b>.
             </span>
           </Modal.Body>
         </Modal>
