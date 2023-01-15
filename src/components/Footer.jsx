@@ -9,7 +9,7 @@ function Footer() {
     <div className="main-footer">
     <div className="footer-content">
         <div className="footer-item">
-            Made by Timur Rakhishov.
+            Designed & Crafted by Timur Rakhishov
         </div>
         <div className="footer-item social">
             <a href="https://github.com/rakhishov">{github}</a>

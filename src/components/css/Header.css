@@ -7,7 +7,21 @@
     cursor: pointer;
 }
 
+.header{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 30px
+  }
+.stats:hover{
+    cursor: pointer;
+}
+
 .text-title{
     position: relative;
     bottom: -2px;
+}
+.st{
+    position: relative;
+    bottom: -4px;
 }

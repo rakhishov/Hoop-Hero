@@ -15,7 +15,7 @@ const Game = () =>{
   const [finish, setFinish] = useState(false);
   const [modalGuess, setModalGuessShow] = useState(true)
 
-  const limitOfGuess = 5
+  const limitOfGuess = 10
   const arrowUp = "\u2191"
   const arrowDown = "\u2193"
   const fetchGuess = async() =>{
@@ -44,14 +44,19 @@ const Game = () =>{
     if("playerid" in localStorage){
     }
     else{
-      var ids = [666786, 145, 132, 175, 15, 434, 115, 140, 322, 57, 237, 490, 117, 70, 125, 666969, 246, 172, 3547238, 274, 472, 417]
+      var ids = [666786, 145, 132, 175, 15, 434, 115, 140, 322, 57, 237, 490, 117, 70, 125, 
+        666969, 246, 172, 3547238, 274, 472, 416, 297, 387, 161, 268, 419, 182, 378, 1125, 4,
+        666581, 265, 38017683, 17895966, 666682, 666633, 54, 303, 403, 
+        666848, 443, 100, 334, 3547245, 360, 17896026, 666423, 666849,
+        3547246, 406, 335, 458, 79, 192, 3547254]
       var randPlayer = ids[Math.floor(Math.random() * ids.length)]
       localStorage.setItem("playerid", randPlayer);
     }
   }
 
   useEffect(()=>{
-    //setStorage();
+    setStorage();
+    createStats();
     getId();
     fetchGuess();
     var players = JSON.parse(localStorage.getItem("players") || "[]")
@@ -109,12 +114,14 @@ const Game = () =>{
       setFinish(true);
       localStorage.setItem("didGuess", true);
       localStorage.setItem("didFinish", true);
+      setRecord(true, numOfGuess)
     }
     setNGuess(numOfGuess+1);
     var n = JSON.parse(localStorage.getItem('numOfGuess') || 0)
     localStorage.setItem("numOfGuess", n+1);
     if(numOfGuess == limitOfGuess-1){
       setFinish(true);
+      setRecord(false, numOfGuess)
       localStorage.setItem("didFinish", true)
     }
   }
@@ -138,11 +145,11 @@ const Game = () =>{
       isSearchable={finish ? false : true}
       isDisabled={finish ? true : false}
       onChange={handleChange}
-      escapeClear sValue={true}
+      labelText = "hello"
       
-      placeholder={!didGuess ? 
-      `Guess ${Math.min(numOfGuess+1, limitOfGuess)} of ${limitOfGuess}`
-      :"Nice Job Man"}
+      placeholder ={!didGuess ?
+      finish ? "Try harder next time!" :`Guess ${Math.min(numOfGuess+1, limitOfGuess)} of ${limitOfGuess}`
+      : "Winner Winner Chicken Dinner"}
       /> 
       </div>
       <div>
@@ -150,8 +157,8 @@ const Game = () =>{
       {
       <div className="guesses">
         <div className="players">
-                  {selectedPlayer.map(p =>(
-                    getPlayer(p, guess, arrowDown, arrowUp, numOfGuess)
+                  {selectedPlayer.map((p, index) =>(
+                    getPlayer(p, guess, arrowDown, arrowUp, index)
                   ))}
                   {(numOfGuess === limitOfGuess && !didGuess)&&
                   <div className="player-full">
@@ -191,7 +198,7 @@ const Game = () =>{
                       <div className="player-box">
                         <div className={"player-item wrong animate delay5"}>{guess.reb}</div>
                         <div className="tag">
-                          AST
+                          REB
                         </div>
                       </div>
                       </div>
@@ -233,12 +240,10 @@ function isClose(stats, player, guess){
   
 }
 
-function getPlayer(p, guess, arrowDown, arrowUp){
+function getPlayer(p, guess, arrowDown, arrowUp, index){
   return(
-              <div className="player-full">
-                
-                    <h2 className="player-name">{p.first_name} {p.last_name} </h2>
-                    
+              <div key={index} className="player-full">
+                    <h2 className="player-name">{index+1 + "."} {p.first_name} {p.last_name} </h2>
                       <div className ="player">
                       
                         <div className="player-box">
@@ -258,7 +263,9 @@ function getPlayer(p, guess, arrowDown, arrowUp){
                           </div>
                         </div>
                         <div className="player-box">
-                          <div className={p.position === guess.position ? "player-item right animate delay2" :"player-item animate delay2"}>{p.position}</div>
+                          <div className={(p.position === guess.position || p.position === guess.position[0] || p.position === guess.position[2] || p.position[0] === guess.position || p.position[2] === guess.position ||
+                            p.position[0] === guess.position[2] || p.position[2] === guess.position[0]) 
+                            ? "player-item right animate delay2" :"player-item animate delay2"}>{p.position}</div>
                           <div className="tag">POS</div>
                         </div>
                         <div className="player-box">
@@ -280,16 +287,54 @@ function getPlayer(p, guess, arrowDown, arrowUp){
 }
 function setStorage(){
   var now = new Date().getTime()
+  var expiryTime = localStorage.getItem("expiryTime")
   var setupTime = localStorage.getItem("setupTime")
-  if(setupTime == null){
-    localStorage.setItem("setupTime", now);
+  var ttl = timeLeftUntilMidnight()
+  if(expiryTime == null){
+    localStorage.setItem("expiryTime", ttl);
+    localStorage.setItem("setupTime", now)
   }
   else{
-    if(now-setupTime > 10*1000){
+    
+    if(now - setupTime > expiryTime){
+      var stats = JSON.parse(localStorage.getItem("stats"))
       localStorage.clear()
+      localStorage.setItem("stats", JSON.stringify(stats))
       localStorage.setItem("setupTime", now)
+      localStorage.setItem("expiryTime", timeLeftUntilMidnight())
     }
   }
+}
+
+function timeLeftUntilMidnight(){
+  var h = new Date().getHours()
+  var m = new Date().getMinutes()
+  var s = new Date().getSeconds()
+  
+  var h_left = 23-h
+  var m_left = 59-m
+  var s_left = 59-s
+  var ttl = s_left*1000 + m_left*60*1000 + h_left * 60 * 60 * 1000;
+  return ttl
+}
+
+function createStats(){
+  var stats = localStorage.getItem("stats")
+  if(stats == null){
+    var stats = Array(11).fill(0);
+    localStorage.setItem("stats", JSON.stringify(stats))
+  }
+}
+
+function setRecord(isGuess, numOfGuess){
+  var stats = JSON.parse(localStorage.getItem("stats"));
+  if(isGuess){
+    stats[numOfGuess]++;
+  }
+  else{
+    stats[stats.length-1]++
+  }
+  localStorage.setItem("stats", JSON.stringify(stats));
 }
 
 function roundToOne(n){

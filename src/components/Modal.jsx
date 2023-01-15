@@ -11,19 +11,19 @@ const ModalInstructions = (props) => {
           aria-labelledby="contained-modal-title-vcenter"
           centered
         >
-          <Modal.Header closeButton>
-            <Modal.Title id="contained-modal-title-vcenter">
+          <Modal.Header>
+            <Modal.Title className='mx-auto' id="contained-modal-title-vcenter">
               How to play
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <h4 className='title-modal'>Game Rules</h4>
             <p>
-            Test your knowledge and guess the current basketball player in 5 tries. 
+            Test your knowledge and guess the current basketball player in 10 tries. 
             The mystery player will play for a club in the NBA.
             </p>
             <p>
-            If you choose to show the player photo, there will be a blurred image of the player to start you off. It will become slightly less blurred after each guess. If you want more of a challenge, selecting the hide photo option will mean that you will be entirely reliant upon the feedback to your guesses.
+            {/* If you choose to show the player photo, there will be a blurred image of the player to start you off. It will become slightly less blurred after each guess. If you want more of a challenge, selecting the hide photo option will mean that you will be entirely reliant upon the feedback to your guesses. */}
             </p>
             <p>
             Feedback will be revealed comparing your guessed player.
@@ -69,7 +69,7 @@ const ModalInstructions = (props) => {
             </p>
             <span>This means that mystery player <b>is not playing for 76ers</b>,
               he is from <b>East</b> conference playing <b>Center</b> position. This player
-              averages <b>less than 33.5 PTS </b>, <b>more and close to 4.6 AST</b> and <b>9.8 REB</b>.
+              averages <b>less than 33.5 PTS</b>, <b>more and close to 4.6 AST</b> and <b>9.8 REB</b>.
             </span>
           </Modal.Body>
         </Modal>

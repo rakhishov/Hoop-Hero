@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import {db} from './firebase/Firebase'
 import { onValue, ref } from "firebase/database";
 import loading from '../assets/loading.svg'
-
+import RestartButton from './RestartGame';
 
 const ModalGuess = ({stat, f, guess, didGuess, numOfGuess}) => {
 
@@ -57,15 +57,18 @@ const ModalGuess = ({stat, f, guess, didGuess, numOfGuess}) => {
             <h3 className="guess-name">{guess!=undefined && guess.first_name + " " + guess.last_name} </h3>
             <div className={'guess-borders ' + (didGuess ? "success-try" : "unsuccess-try")}>
               <div className='guess-content'>
-                {imgId == null ? <img className='loading-screen' src = {loading} /> : <img className='guess-photo' src = {urlImg+imgId+".png"}/>}
-                <p className='finished-game'>{didGuess && `Amazing! It took only ${numOfGuess} guesses`} {!didGuess && "Unfortunately, You couldn't guess it :("}</p>
+                {imgId == null ? <img className='loading-screen' src = {loading} /> : <img className='guess-photo' src = {urlImg+imgId+".png"}/>}       
+                <p className='finished-game'>{didGuess && `Amazing! It took only ${numOfGuess} ${numOfGuess == 1 ? "guess!" : "guesses!" }`} {!didGuess && "Unfortunately, you couldn't guess it :("}</p>
+                
               </div>
               
             </div>
             
-          <p>{`The next player will be available in ${h.toString().padStart(2, '0')}:${m
+          <p className="modal-guess-result">{`The next player will be available in `}</p>
+          <h2 className='timer'>{h.toString().padStart(2, '0')}:{m
                 .toString()
-                .padStart(2, '0')}:${s.toString().padStart(2, '0')}`}</p>
+                .padStart(2, '0')}:{s.toString().padStart(2, '0')}</h2>
+          <span className=''>or you can play again right now {<RestartButton/>}</span>
           </Modal.Body>
         </Modal>
       );
