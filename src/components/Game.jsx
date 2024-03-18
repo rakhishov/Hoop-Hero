@@ -32,7 +32,6 @@ const Game = () => {
             )
             .then((res) => {
               const stats = res.data.data[0];
-              console.log(stats);
               guess.pts = roundToOne(stats.pts);
               guess.ast = roundToOne(stats.ast);
               guess.reb = roundToOne(stats.reb);
