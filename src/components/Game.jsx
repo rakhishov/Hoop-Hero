@@ -5,7 +5,7 @@ import { useEffect } from "react";
 import * as NBAIcons from "react-nba-logos";
 import ModalGuess from "./ModalGuess";
 import { set } from "firebase/database";
-
+axios.defaults.headers.common['Authorization'] = import.meta.env.VITE_AUTHORIZATION
 const Game = () => {
   const [inputValue, setInput] = useState();
   const [selectedPlayer, updateSelectedPlayer] = useState([]);
@@ -23,22 +23,23 @@ const Game = () => {
     var id = JSON.parse(localStorage.getItem("playerid"));
     if (guess === undefined) {
       await axios
-        .get(`https://www.balldontlie.io/api/v1/players/${id}`)
+        .get(`https://api.balldontlie.io/v1/players/${id}`,)
         .then(async (res) => {
-          const guess = res.data;
+          const guess = res.data.data;
           await axios
             .get(
-              `https://www.balldontlie.io/api/v1/season_averages?player_ids[]=${guess.id}`
+              `https://api.balldontlie.io/v1/season_averages?season=2023&player_ids[]=${guess.id}`
             )
             .then((res) => {
               const stats = res.data.data[0];
+              console.log(stats);
               guess.pts = roundToOne(stats.pts);
               guess.ast = roundToOne(stats.ast);
               guess.reb = roundToOne(stats.reb);
               setGuess(guess);
             });
 
-          localStorage.setItem("guess", JSON.stringify(res.data));
+          localStorage.setItem("guess", JSON.stringify(res.data.data));
         });
     }
   };
@@ -75,7 +76,7 @@ const Game = () => {
 
   const inputHandler = () => {
     return axios
-      .get(`https://www.balldontlie.io/api/v1/players?search=${inputValue}`)
+      .get(`https://api.balldontlie.io/v1/players?search=${inputValue}`)
       .then((res) => {
         const dat = res.data.data.filter((p) => {
           return p.position != "";
@@ -87,7 +88,7 @@ const Game = () => {
   const handleChange = async (p) => {
     const response = await axios
       .get(
-        `https://www.balldontlie.io/api/v1/season_averages?player_ids[]=${p.id}`
+        `https://api.balldontlie.io/v1/season_averages?season=2023&player_ids[]=${p.id}`
       )
       .then((res) => {
         const stats = res.data.data[0];
